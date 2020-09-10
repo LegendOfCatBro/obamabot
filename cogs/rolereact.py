@@ -24,5 +24,17 @@ class rolereact(commands.Cog):
         if c.fetchone() == (str(payload.channel_id),):
             print('Reaction detected in roles channel!')
             
+            
+            
+            
 def setup(bot):
     bot.add_cog(rolereact(bot))
+    conn = sqlite3.connect('bot.db')
+    c = conn.cursor()
+    for guild in bot.guilds:
+        gnt = str(guild.name)
+        git = str(guild.id)
+        c.execute("CREATE TABLE IF NOT EXISTS 'guilds' ('ID' INTEGER,'gid' TEXT UNIQUE,'gname' TEXT,'starid' TEXT,'roleid' TEXT,PRIMARY KEY('ID'))")
+    conn.commit()
+    conn.close
+            

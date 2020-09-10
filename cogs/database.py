@@ -68,8 +68,6 @@ def setup(bot):
         gnt = str(guild.name)
         git = str(guild.id)
         c.execute("CREATE TABLE IF NOT EXISTS 'guilds' ('ID' INTEGER,'gid' TEXT UNIQUE,'gname' TEXT,'starid' TEXT,'roleid' TEXT,PRIMARY KEY('ID'))")
-    for row in c.execute('SELECT * FROM guilds ORDER BY ID'):
-        print(row)
     conn.commit()
     conn.close
             
