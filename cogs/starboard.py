@@ -3,7 +3,6 @@ import discord
 import sqlite3
 from discord.ext import commands
 from discord.utils import get
-from discord.utils import find
 
 class starboard(commands.Cog):
     def __init__(self, bot):
@@ -51,7 +50,7 @@ class starboard(commands.Cog):
             except:
                 x = discord.Embed(title='Error!', description='Error sending embed to starboard! The starboard channel ID could be invalid.', color =0x7C0A02) 
                 await sauce.send(embed = x)
-                await sauce.send(embed = e)
+
            
             
 def setup(bot):

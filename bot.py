@@ -10,7 +10,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix=('obama ', 'hey obama '))
 bot.error_titles = (
-    'fuck', 'shit', "god dammit", "fuck you" 'nope', 'fiddlesticks', 
+    'fuck', 'shit', "god dammit", "fuck you", 'nope', 'fiddlesticks', 
     'excuse me nigga', 'kill me', 'nice try jackass', 'No way', 
     'the fuck did you just say to me you little shit?', 'i quit',
 )  
