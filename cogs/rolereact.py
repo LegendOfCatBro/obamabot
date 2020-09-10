@@ -12,8 +12,6 @@ class rolereact(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
        
-        #change these to your preference 
-        rolereact_name = 'roles'
         rolereact_color = 0xF9A602
         
         conn = sqlite3.connect('bot.db')
