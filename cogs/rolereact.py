@@ -42,11 +42,12 @@ class rolereact(commands.Cog):
                     await react.remove(user)
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self,payload):
+        guild = self.bot.get_guild(payload.guild_id)
+        member = guild.get_member(payload.user_id)
         conn = sqlite3.connect('bot.db')
         c = conn.cursor()
         c.execute('SELECT roleid FROM guilds WHERE gid=?', (str(payload.guild_id),))
         roid = c.fetchone()
-        guild = self.bot.get_guild(payload.guild_id)
         sauce = guild.get_channel(payload.channel_id)
         msg = await sauce.fetch_message(payload.message_id)
         emo = payload.emoji.name
@@ -56,10 +57,12 @@ class rolereact(commands.Cog):
             emoDict[row[0]] = row[1]
         conn.close
         if roid == (str(payload.channel_id),):
-            g = emoDict[payload.emoji.name]
-            rol = guild.get_role(int(g))
-            member = guild.get_member(payload.user_id)
-            await member.remove_roles(rol)
+            try:
+                g = emoDict[payload.emoji.name]
+                rol = guild.get_role(int(g))
+                await member.remove_roles(rol)
+            except:
+                pass
   
 def setup(bot):
     bot.add_cog(rolereact(bot))

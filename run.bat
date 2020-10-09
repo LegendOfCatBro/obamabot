@@ -1,3 +1,3 @@
 @ECHO OFF
-python bot.py
+py bot.py
 pause

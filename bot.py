@@ -77,6 +77,7 @@ async def on_command_error(ctx, error):
     
     
 @bot.command(description=f'reloads the specified cog')
+@commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
 async def reload(ctx, *, ext):
     cog = f"cogs.{ext}"
     try:
@@ -93,6 +94,7 @@ async def reload(ctx, *, ext):
             )
     await ctx.send(embed=embed)
 
+@commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
 @bot.command(description=f'unloads the specified cog')
 async def unload(ctx, *, ext):
     cog = f"cogs.{ext}"
@@ -104,7 +106,8 @@ async def unload(ctx, *, ext):
             colour=ctx.author.color
             )
     await ctx.send(embed=embed)
-    
+
+@commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())    
 @bot.command(description=f'loads the specified cog')
 async def load(ctx, *, ext):
     cog = f"cogs.{ext}"

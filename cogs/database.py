@@ -9,11 +9,12 @@ class database(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
+        @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
         @bot.command(
             name='eunbind',
             desciption='Removes the emoji and role pair from the self-assign role database'
         )
-        async def ebind(ctx, emo:str, role:str):
+        async def eunbind(ctx, emo:str, role:str):
             gid = str(ctx.guild.id)
             rgid = f"{gid}{emo}"
             conn = sqlite3.connect('bot.db')
@@ -31,6 +32,8 @@ class database(commands.Cog):
                 colour=ctx.author.color
                 )
             await ctx.send(embed = embed)
+        
+        @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
         @bot.command(
             name='ebind',
             description='Adds the emoji and role pair to the self-assign role database'
@@ -56,7 +59,9 @@ class database(commands.Cog):
                 title=f'Successfully bound {emo} to {role}', 
                 colour=ctx.author.color
                 )
-            await ctx.send(embed=embed) 
+            await ctx.send(embed=embed)
+        
+        @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
         @bot.command(
             name='bind',
             description='Adds the channel ID of the specified channel to the specified column. Essentially, sets the desired channel to serve the desired function.'
@@ -85,6 +90,8 @@ class database(commands.Cog):
             conn.commit()
             conn.close
             await ctx.send(embed=embed)    
+        
+        @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
         @bot.command(
             name='readb',
             description='Reads out all entries in the database row for this guild'
