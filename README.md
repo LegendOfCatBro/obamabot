@@ -8,7 +8,7 @@ it can do lotsa cool things such as:
 
 -react to your messages with images or text
 
--(WIP) give roles when a message is reacted on/on join
+-give roles when a message is reacted on
 
 -make me feel good about myself
 
