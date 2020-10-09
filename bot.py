@@ -75,50 +75,7 @@ async def on_command_error(ctx, error):
             )
     await ctx.send(embed=embed)
     
-    
-@bot.command(description=f'reloads the specified cog')
-@commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
-async def reload(ctx, *, ext):
-    cog = f"cogs.{ext}"
-    try:
-        bot.unload_extension(cog)
-        print(f'Successfully unloaded {cog}')
-    except commands.ExtensionNotLoaded:
-        pass
-    bot.load_extension(cog)
-    print(f'Successfully loaded {cog}')
-    embed = discord.Embed(
-            title='reload successful', 
-            description=(f'Successfully reloaded {cog}'), 
-            colour=ctx.author.color
-            )
-    await ctx.send(embed=embed)
-
-@commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
-@bot.command(description=f'unloads the specified cog')
-async def unload(ctx, *, ext):
-    cog = f"cogs.{ext}"
-    bot.unload_extension(cog)
-    print(f'Successfully unloaded {cog}')
-    embed = discord.Embed(
-            title='unload successful', 
-            description=(f'Successfully unloaded {cog}'), 
-            colour=ctx.author.color
-            )
-    await ctx.send(embed=embed)
-
-@commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())    
-@bot.command(description=f'loads the specified cog')
-async def load(ctx, *, ext):
-    cog = f"cogs.{ext}"
-    bot.load_extension(cog)
-    print(f'Successfully loaded {cog}')
-    embed = discord.Embed(
-            title='load successful', 
-            description=(f'Successfully loaded {cog}'), 
-            colour=ctx.author.color
-            )
-    await ctx.send(embed=embed)
-    
 bot.run(TOKEN)
+
+
 
