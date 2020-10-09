@@ -33,7 +33,7 @@ class utilities(commands.Cog):
     )
     async def unload(self, ctx, ext):
         cog = f"cogs.{ext}"
-        bot.unload_extension(cog)
+        self.bot.unload_extension(cog)
         print(f'Successfully unloaded {cog}')
         embed = discord.Embed(
                 title='unload successful', 
@@ -49,7 +49,7 @@ class utilities(commands.Cog):
     )
     async def load(self, ctx, ext):
         cog = f"cogs.{ext}"
-        bot.load_extension(cog)
+        self.bot.load_extension(cog)
         print(f'Successfully loaded {cog}')
         embed = discord.Embed(
                 title='load successful', 
