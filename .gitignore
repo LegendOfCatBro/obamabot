@@ -3,6 +3,7 @@
 
 #custom
 temp/
+.db
 
 
 ### Python ###
