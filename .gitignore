@@ -3,7 +3,7 @@
 
 #custom
 temp/
-.db
+bot.db
 
 
 ### Python ###
