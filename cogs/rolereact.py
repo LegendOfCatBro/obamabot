@@ -63,7 +63,7 @@ class rolereact(commands.Cog):
                 await member.remove_roles(rol)
             except:
                 pass
-  
+
 def setup(bot):
     bot.add_cog(rolereact(bot))
     conn = sqlite3.connect('bot.db')

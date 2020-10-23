@@ -133,8 +133,7 @@ class database(commands.Cog):
         if fields == 0:
             e.add_field(name='Error!', value='Table is empty')
         await ctx.send(embed=e)
-
-
+    
 def setup(bot):
     bot.add_cog(database(bot))
     conn = sqlite3.connect('bot.db')
