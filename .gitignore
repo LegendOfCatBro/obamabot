@@ -4,6 +4,8 @@
 #custom
 temp/
 bot.db
+debugbot.py
+debugrun.bat
 
 
 ### Python ###

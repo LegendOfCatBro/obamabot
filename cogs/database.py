@@ -14,7 +14,7 @@ class database(commands.Cog):
         name='eunbind',
         desciption='Removes the emoji and role pair from the self-assign role database'
     )
-    async def eunbind(ctx, emo:str, role:str):
+    async def eunbind(self, ctx, emo):
         gid = str(ctx.guild.id)
         rgid = f"{gid}{emo}"
         conn = sqlite3.connect('bot.db')
@@ -28,7 +28,7 @@ class database(commands.Cog):
         conn.commit()
         conn.close
         embed = discord.Embed(
-            title=f'Successfully unbound {emo} from {role}', 
+            title=f'Successfully unbound {emo}', 
             colour=ctx.author.color
             )
         await ctx.send(embed = embed)
@@ -38,7 +38,7 @@ class database(commands.Cog):
         name='ebind',
         description='Adds the emoji and role pair to the self-assign role database'
     )
-    async def ebind(ctx, emo: str, role: str):
+    async def ebind(self, ctx, emo: str, role: str):
         try:
             r = find(lambda m: m.name == role, ctx.guild.roles)
         except:
@@ -66,7 +66,7 @@ class database(commands.Cog):
         name='bind',
         description='Adds the channel ID of the specified channel to the specified column. Essentially, sets the desired channel to serve the desired function.'
     )
-    async def bind(ctx, channel: str, column: str):
+    async def bind(self, ctx, channel: str, column: str):
         try:
             ch = find(lambda m: m.name == channel, ctx.guild.text_channels)
         except:
@@ -96,24 +96,42 @@ class database(commands.Cog):
         name='readb',
         description='Reads out all entries in the database row for this guild'
     )
-    async def readb(ctx, table: str):
+    async def readb(self, ctx, table):
         conn = sqlite3.connect('bot.db')
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        if table == 'guilds':
-            c.execute('SELECT * FROM guilds WHERE gid=?',(str(ctx.guild.id),))
-        if table == 'roles':
-            c.execute('SELECT * FROM roles WHERE gid=?',(str(ctx.guild.id),))
         e = discord.Embed(
             title=f'Database data for {ctx.guild.name}', 
             colour=ctx.author.color
             )
+        if table == 'guilds':
+            c.execute('SELECT * FROM guilds WHERE gid=?',(str(ctx.guild.id),))
+        elif table == 'roles':
+            c.execute('SELECT * FROM roles WHERE gid=?',(str(ctx.guild.id),))
+        else:
+            e.add_field(name='Error!', value='Table not found')
+        fields = 0
+        pages = 1
         for row in c.fetchall():
             t = row.keys()
-            g = 0
+            itms = 0
+            rw = ''
             for item in row:
-                e.add_field(name=f'{t[g]}', value=f'{item}', inline=False)
-                g += 1
+                rw += f'[{t[itms]}: {item}]'
+                itms += 1
+            if fields == 24:
+                e.add_field(name='Error!', value='Too many rows, going to next page')
+                pages += 1
+                await ctx.send(embed=e)
+                e = discord.Embed(
+                    title=f'Database data for {ctx.guild.name} part {pages}', 
+                    colour=ctx.author.color
+                    )
+            else:    
+                e.add_field(name='row: ', value=rw)
+            fields += 1
+        if fields == 0:
+            e.add_field(name='Error!', value='Table is empty')
         await ctx.send(embed=e)
 
 
