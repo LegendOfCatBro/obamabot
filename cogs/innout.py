@@ -32,6 +32,7 @@ class innout(commands.Cog):
         
     @commands.Cog.listener()
     async def on_member_remove(self, member):
+        print('Memeber left')
         random.seed()
         u = member.display_name
         titles = ('Farewell', 'Goodbye', 'See you later alligator', 'Adiós', 'Bye', 'See ya','We won\'t miss you', 'Later, nerd', 'See you in hell', 'F')

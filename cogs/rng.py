@@ -74,6 +74,11 @@ class rng(commands.Cog):
             bd += f'= {sum}'   
         embed.add_field(name=f'You rolled {sum}!', value=bd)
         await ctx.send(embed=embed)
+    @commands.command(name='oracle', description='Ask obama to solve your problems')
+    async def oracle(self, ctx, *, args):
+        print('oracle')
+
+
 def setup(bot):
     bot.add_cog(rng(bot))
 def IsInt(x):

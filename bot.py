@@ -4,6 +4,8 @@ import asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
 from random import choice
+intents = discord.Intents.default()
+intents.members = True
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')

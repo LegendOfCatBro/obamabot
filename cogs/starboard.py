@@ -13,13 +13,12 @@ class starboard(commands.Cog):
         
         #change these to your preference 
         starboard_emoji = '⭐'
-        starboard_name = 'starboard'
         starboard_threshold = 1
         starboard_color = 0xF9A602
     
         conn = sqlite3.connect('bot.db')
         c = conn.cursor()
-        c.execute('SELECT starid FROM guilds WHERE gid=?',(str(payload.guild_id),))
+        c.execute("SELECT emoch FROM guilds WHERE id=? AND role='starboard'",(str(payload.guild_id),))
         bid = c.fetchone()
         board = self.bot.get_channel(int(bid[0]))
         guild = self.bot.get_guild(payload.guild_id)
