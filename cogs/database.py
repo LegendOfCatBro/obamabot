@@ -3,6 +3,7 @@ import discord
 import sqlite3
 from discord.ext import commands
 from discord.utils import find
+from random import choice
 
 class database(commands.Cog):
     def __init__(self, bot):
@@ -77,7 +78,7 @@ class database(commands.Cog):
             gg = (str(ctx.guild.id),)
             c.execute('SELECT rowid, id, role, emoch, rgid FROM guilds WHERE id = ?', gg)
             dd = c.fetchall()
-        if table == 'users':
+        elif table == 'users':
             c.execute('SELECT rowid, * FROM users')
             dd = c.fetchall()
         else:
@@ -97,7 +98,7 @@ class database(commands.Cog):
             if fields == 24:
                 e.add_field(name='Error!', value='Too many rows, going to next page')
                 pages += 1
-                fields == 0
+                fields = 0
                 await ctx.send(embed=e)
                 e = discord.Embed(
                     title=f'Database data for {ctx.guild.name} part {pages}', 
@@ -109,6 +110,17 @@ class database(commands.Cog):
         if fields == 0:
             e.add_field(name='Error!', value='Table is empty')
         await ctx.send(embed=e)
+        
+    @commands.check(commands.is_owner())
+    @commands.command(name='sqlinject', description='directly inject into the database')
+    async def sqlinject(self, ctx, query):
+        conn = sqlite3.connect('bot.db')
+        c = conn.cursor()
+        c.execute(query)
+        conn.commit()
+        conn.close
+        print(f'Query executed: {query}')
+
         
     
 def scrub(table_name):

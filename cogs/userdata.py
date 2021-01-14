@@ -1,16 +1,71 @@
 import discord
 import sqlite3
-from discord.ext import commands
+import threading
+import random
+from discord.ext import tasks, commands
 from discord.utils import find
 from datetime import datetime
 from datetime import date
 from pytz import timezone
 from pytz import common_timezones
+from random import choice
 
 class userdata(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.index = 0
+        self.bday.start()
+    def cog_unload(self):
+        self.bday.cancel()
     
+    @tasks.loop(seconds=60.0)
+    async def bday(self):
+        conn=sqlite3.connect('bot.db')
+        c=conn.cursor()
+        c.execute("SELECT id,timezone,birthday FROM users")
+        usrs = c.fetchall()
+        for user in usrs:
+            if user[2]:
+                bday = date.fromisoformat(user[2]).replace(year=datetime.now().date().year)
+                if user[1]:
+                    t1 = datetime.now(timezone(user[1]))
+                    today = t1.date()
+                    now = f'{t1.hour}:{t1.minute}'
+                else:
+                    t2 = datetime.now()
+                    today = t2.date()
+                    now = f'{t2.hour}:{t2.minute}'
+                if today == bday and now == '9:11':
+                    c.execute("SELECT * FROM guilds WHERE role='bday'")
+                    glds = c.fetchall()
+                    for guld in glds:
+                        guild = self.bot.get_guild(int(guld[0]))
+                        if guild.get_member(user[0]):
+                            ch = guild.get_channel(int(guld[2]))
+                            titles=('happy bitchday', 'happy your parents fucked 9 months ago', 'pleasant anniversarry of your birth', 'one year closer to the sweet release of death')
+                            images=('https://images-ext-2.discordapp.net/external/oq_t8Mr3ubuXm56iu3ZYvQiBAC7L_y6vd30CdOMDM_s/https/apocake.files.wordpress.com/2020/01/cake-13.jpg?width=524&height=684',
+                                    'https://media.discordapp.net/attachments/718134843455832095/789982106108297226/image0.png',
+                                    'https://media.discordapp.net/attachments/718134843455832095/789982131413581865/image0.png',
+                                    'https://media.discordapp.net/attachments/718134843455832095/789987686340755466/cakes-with-threatening-auras-23-5f4d0323bf3d7__700.png',
+                                    'https://media.discordapp.net/attachments/718134843455832095/789987637606875136/cakes-with-threatening-auras.png',
+                                    'https://media.discordapp.net/attachments/718134843455832095/789987567939616808/EDOk8n2XoAE7R3G.png',
+                                    'https://media.discordapp.net/attachments/718134843455832095/789987462302269450/5-cursed-cakes-1599150988834.png',
+                                    'https://media.discordapp.net/attachments/718134843455832095/789987436842188830/4uujjq9n9w611.png?width=553&height=684',
+                                    'https://media.discordapp.net/attachments/718134843455832095/789988015438037022/7bcd064e91a915f99722d55e438871ef.png',
+                                    'https://media.discordapp.net/attachments/718134843455832095/789988066068529162/cakes-with-threatening-auras-45-5f4d034fb3b74__700.png'
+                                    )
+                            random.seed()
+                            mbmr = guild.get_member(user[0])
+                            colr = random.randint(0, 0xffffff)
+                            e = discord.Embed(title=choice(titles), description=f'It is {mbmr.mention}\'s birthday !', color=colr)
+                            img = choice(images)
+                            print(img)
+                            e.set_image(url=img)
+                            await ch.send(embed=e)
+    @bday.before_loop
+    async def before_bday(self):
+        print('waiting...')
+        await self.bot.wait_until_ready()
     @commands.command(
         name='timezones',
         description='Show information on timezones that can be bound to your profile!'
@@ -152,7 +207,7 @@ class userdata(commands.Cog):
         e.add_field(name='Sexuality', value=data[6])
         e.set_thumbnail(url=user.avatar_url)
         await ctx.send(embed=e)
-        
+
             
 def setup(bot):
     bot.add_cog(userdata(bot))

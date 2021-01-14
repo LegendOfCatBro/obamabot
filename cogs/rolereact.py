@@ -55,6 +55,14 @@ class rolereact(commands.Cog):
             g = emoDict[payload.emoji.name]
             rol = guild.get_role(int(g))
             await member.remove_roles(rol)
+            
+ #   @commands.Cog.listener()
+  #  async def on_message(self, message):
+   #     guild = ctx.guild
+    #    
+     #   conn = sqlite3.connect('bot.db')
+      #  c = conn.cursor()
+        
 
 def setup(bot):
     bot.add_cog(rolereact(bot))

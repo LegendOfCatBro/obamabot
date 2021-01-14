@@ -4,13 +4,12 @@ import asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
 from random import choice
-intents = discord.Intents.default()
-intents.members = True
+intents = discord.Intents.all()
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix=('obama ', 'hey obama '))
+bot = commands.Bot(command_prefix=('obama ', 'hey obama ', 'Obama', 'Hey Obama', 'hey Obama'), intents=intents)
 bot.error_titles = (
     'fuck', 'shit', "god dammit", "fuck you", 'nope', 'fiddlesticks', 
     'excuse me nigga', 'kill me', 'nice try jackass', 'No way', 
