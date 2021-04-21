@@ -206,8 +206,46 @@ class userdata(commands.Cog):
         e.add_field(name='Pronouns', value=data[5])
         e.add_field(name='Sexuality', value=data[6])
         e.set_thumbnail(url=user.avatar_url)
-        await ctx.send(embed=e)
-
+        await ctx.send(embed=e)  
+    @commands.command(
+        name='setrole',
+        desciption='Alters your custom role'
+    )
+    async def setrole(self, ctx, name, color):
+        conn=sqlite3.connect('bot.db')
+        c=conn.cursor()
+        uid=ctx.author.id
+        gid=ctx.guild.id
+        guild=ctx.guild
+        user=ctx.author
+        ugid=f'{uid}x{gid}'
+        c.execute("SELECT * FROM guilds WHERE emoch='roleanchor😊'")
+        if not c.fetchone():
+            e=discord.Embed(title=f'That feature has not been set up in this server!', color=ctx.author.color)
+            await ctx.send(embed=e)
+            return
+        c.execute(f'SELECT * FROM userroles WHERE ugid={ugid}')
+        g=c.fetchone()
+        if g:
+            rid=g[2]
+            role = guild.get_role(int(rid))
+            await role.edit(name=name,color=discord.Color(int(color, 16)))
+        else:
+            c.execute("SELECT * FROM guilds WHERE emoch='roleanchor😊'")
+            f=c.fetchone()[1]
+            anchor = guild.get_role(int(f))
+            await guild.create_role(name=name, color=discord.Color(int(color, 16)))
+            role = guild.get_role(int(f))
+            pos=role.position-1
+            role = find(lambda m: m.position == 1, ctx.guild.roles)
+            rid =role.id
+            await role.edit(position=pos)
+        arg=(name,color,name,color)
+        c.execute(f"INSERT INTO userroles (uid, gid, rid, rname, color, ugid) VALUES ({uid},{gid},{rid}, ?,?,{ugid}) ON CONFLICT(ugid) DO UPDATE SET rname=?, color=?", arg)
+        conn.commit()
+        conn.close
+        await discord.Member.add_roles(user, role)
             
+           
 def setup(bot):
     bot.add_cog(userdata(bot))

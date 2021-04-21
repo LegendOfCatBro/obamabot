@@ -27,6 +27,13 @@ class database(commands.Cog):
             c.execute("DELETE FROM guilds WHERE rowid=? AND id=?", arg)
             conn.commit()
             conn.close
+        elif tbl == 'userroles':
+            conn = sqlite3.connect('bot.db')
+            c = conn.cursor()
+            arg = (row, str(ctx.guild.id))
+            c.execute("DELETE FROM userroles WHERE rowid=? AND gid=?", arg)
+            conn.commit()
+            conn.close 
         x = discord.Embed(title='unbinding successful',description=f'item {row} successfully unbound',color=ctx.author.color) 
         await ctx.send(embed = x)
     
@@ -80,6 +87,9 @@ class database(commands.Cog):
             dd = c.fetchall()
         elif table == 'users':
             c.execute('SELECT rowid, * FROM users')
+            dd = c.fetchall()
+        elif table == 'userroles':
+            c.execute('SELECT rowid, * FROM userroles')
             dd = c.fetchall()
         else:
             e.add_field(name='Error!', value='Table not found')
@@ -136,6 +146,7 @@ def setup(bot):
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
     c.execute("CREATE TABLE IF NOT EXISTS 'guilds' ('id' TEXT, 'role' TEXT,'emoch' TEXT, 'rgid' TEXT UNIQUE)")
+    c.execute("CREATE TABLE IF NOT EXISTS 'userroles' ('uid' TEXT, 'gid' TEXT, 'rid' TEXT, 'rname' TEXT,'color' TEXT, 'ugid' TEXT UNIQUE)")
     c.execute("CREATE TABLE IF NOT EXISTS 'users' ('id' INTEGER UNIQUE, 'name' TEXT, 'birthday' TEXT, 'location' TEXT, 'timezone' TEXT, 'pronouns' TEXT, 'sexuality' TEXT)")
     conn.commit()
     conn.close

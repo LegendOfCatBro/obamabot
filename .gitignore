@@ -6,6 +6,7 @@ temp/
 bot.db
 debugbot.py
 debugrun.bat
+cogs/bd.py
 
 
 ### Python ###

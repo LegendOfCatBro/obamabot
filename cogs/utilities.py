@@ -57,6 +57,5 @@ class utilities(commands.Cog):
                 colour=ctx.author.color
                 )
         await ctx.send(embed=embed)
-        
 def setup(bot):
     bot.add_cog(utilities(bot))   
