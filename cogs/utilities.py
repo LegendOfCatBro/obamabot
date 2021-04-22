@@ -8,7 +8,7 @@ class utilities(commands.Cog):
     @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
     @commands.command(
         name='reload', 
-        decription='reloads the specified cog'
+        decription='**obama reload {cog}**: reloads specified cog'
     )
     async def reload(self, ctx, ext):
         cog = f"cogs.{ext}"
@@ -29,7 +29,7 @@ class utilities(commands.Cog):
     @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
     @commands.command(
         name='unload',
-        description='unloads the specified cog'
+        description='**obama unload {cog}**: unloads specified cog'
     )
     async def unload(self, ctx, ext):
         cog = f"cogs.{ext}"
@@ -45,7 +45,7 @@ class utilities(commands.Cog):
     @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())    
     @commands.command(
         name='load', 
-        description='loads the specified cog'
+        description='**obama load {cog}**: loads specified cog'
     )
     async def load(self, ctx, ext):
         cog = f"cogs.{ext}"

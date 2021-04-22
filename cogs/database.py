@@ -11,67 +11,64 @@ class database(commands.Cog):
         
     @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
     @commands.command(
-        name='utilunbind',
-        desciption='Binds an item to a slot in the database'
+        name='opunbind',
+        desciption='**obama opunbind {table} {row}**: Operator unbind, removes an item from the given table. Valid tables include: **ugconfig**, **gconfig**, and **userroles**.'
     )
-    async def utilunbind(self, ctx, tbl, row):
-        if not row.isnumeric():
-            print('Exception on unbind: Row ID must be a numeral!')
-            x = discord.Embed(title='Error!', description='Row ID must be a numeral!', color =0x7C0A02) 
-            await ctx.send(embed = x)
+    async def opunbind(self, ctx, tbl, row):
+        tblnames=('ugconfig','gconfig','userroles')
+        if not row.isnumeric() or tbl not in tblnames:
+            raise commands.BadArgument()
             return
-        if tbl == 'guilds':
-            conn = sqlite3.connect('bot.db')
-            c = conn.cursor()
-            arg = (row, str(ctx.guild.id))
-            c.execute("DELETE FROM guilds WHERE rowid=? AND id=?", arg)
-            conn.commit()
-            conn.close
-        elif tbl == 'userroles':
-            conn = sqlite3.connect('bot.db')
-            c = conn.cursor()
-            arg = (row, str(ctx.guild.id))
-            c.execute("DELETE FROM userroles WHERE rowid=? AND gid=?", arg)
-            conn.commit()
-            conn.close 
+        conn = sqlite3.connect('bot.db')
+        c = conn.cursor()
+        arg = (row, ctx.guild.id)
+        c.execute(f"DELETE FROM {tbl} WHERE rowid=? AND id=?", arg)
+        conn.commit()
+        conn.close
+
         x = discord.Embed(title='unbinding successful',description=f'item {row} successfully unbound',color=ctx.author.color) 
         await ctx.send(embed = x)
     
     @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
     @commands.command(
-        name='utilbind',
-        desciption='Binds an item to a slot in the database'
+        name='config',
+        description='`obama config {job} {value} {valuetype}`: Binds a new item to the config table. Try `obama confighelp` for details on valid jobs and value type combinations.'
     )
-    async def uitilbind(self, ctx, inp1, inp2):
+    async def config(self, ctx, job, inpvalue, valuetype):
+        value=inpvalue
+        job = job.upper()
+        valuetype=valuetype.upper()
         conn = sqlite3.connect('bot.db')
         c = conn.cursor()
-        if inp2.isalpha():
-            t = ctx.guild.text_channels
-        else:
-            t = ctx.guild.roles
-        inp3 = find(lambda m: m.name == inp1, t)
-        if not inp1:
-            print('Exception on bind: Unable to find desired objecct!')
-            x = discord.Embed(title='Error!', description='Error finding desired object!', color =0x7C0A02) 
-            await ctx.send(embed = x)
+        validtypes=('ROLE', 'CHANNEL', 'MESSAGE', 'STRING')
+        if valuetype not in validtypes:
+            raise commands.BadArgument()
             return
-        imp1 = str(inp3.id)
-        id = str(ctx.guild.id)
-        gid = str(ctx.guild.id) + inp2
-        arg = (id, imp1, inp2, gid, id, imp1, inp2)
-        if inp2.isalpha():
-            arg = (id, inp2, imp1, gid, id, inp2, imp1)
-            print(arg)
-        c.execute("INSERT INTO guilds (id, role, emoch, rgid) VALUES (?,?,?,?) ON CONFLICT(rgid) DO UPDATE SET id=?, role=?, emoch=?", arg)
-        print("bind2 successful")
-        x = discord.Embed(title='binding successful',description=f'{inp1} bound to {inp2}',color=ctx.author.color) 
+        validtypes={'ROLE':ctx.guild.roles,'CHANNEL':ctx.guild.channels} 
+        if valuetype == "ROLE" or valuetype == "CHANNEL":
+            value = find(lambda m: m.name == value, validtypes[valuetype]).id
+        elif valuetype == "MESSAGE":
+            value = value.split('/')[6]
+        id=ctx.guild.id
+        args = (id,job,str(value),valuetype)
+        uniquejobs=('STARCHANNEL','ROLECHANNEL','STARTHRESHOLD','STAREMOJI')
+        if job in uniquejobs:
+            args = args + (str(id)+job, id, job, str(value), valuetype)
+            c.execute("INSERT INTO guconfig (id, job, value, valuetype, uniqueid) VALUES (?,?,?,?,?) ON CONFLICT(uniqueid) DO UPDATE SET id=?, job=?, value=?, valuetype=?", args)
+            print(f"unique config changed: {job} {value} {valuetype}")
+        else:
+            c.execute("INSERT INTO gconfig (id, job, value, valuetype) VALUES (?,?,?,?)", args)
+            print(f"config added: {job} {value} {valuetype}")
+        x = discord.Embed(title='binding successful',description=f'{job} configured to value {inpvalue}',color=ctx.author.color) 
         await ctx.send(embed = x)
         conn.commit()
         conn.close    
+
+
     @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
     @commands.command(
         name='readb',
-        description='Reads out all entries in the database row for this guild'
+        description='**obama readb {table}**: Reads out all entries related to the current guild in the given database table'
     )
     async def readb(self, ctx, table):
         conn = sqlite3.connect('bot.db')
@@ -81,20 +78,12 @@ class database(commands.Cog):
             title=f'Database data for {ctx.guild.name}', 
             colour=ctx.author.color
             )
-        if table == 'guilds':
-            gg = (str(ctx.guild.id),)
-            c.execute('SELECT rowid, id, role, emoch, rgid FROM guilds WHERE id = ?', gg)
-            dd = c.fetchall()
-        elif table == 'users':
-            c.execute('SELECT rowid, * FROM users')
-            dd = c.fetchall()
-        elif table == 'userroles':
-            c.execute('SELECT rowid, * FROM userroles')
-            dd = c.fetchall()
-        else:
-            e.add_field(name='Error!', value='Table not found')
-            await ctx.send(embed=e)
-            return
+        tablenames=('guconfig','gconfig','userroles', 'users')
+        if table not in tablenames:
+            raise commands.BadArgument()
+        id = ctx.guild.id
+        c.execute(f'SELECT rowid, * FROM {table} WHERE id = {ctx.guild.id}')
+        dd=c.fetchall()
         fields = 0
         pages = 1
         
@@ -120,34 +109,15 @@ class database(commands.Cog):
         if fields == 0:
             e.add_field(name='Error!', value='Table is empty')
         await ctx.send(embed=e)
-        
-    @commands.check(commands.is_owner())
-    @commands.command(name='sqlinject', description='directly inject into the database')
-    async def sqlinject(self, ctx, query):
-        conn = sqlite3.connect('bot.db')
-        c = conn.cursor()
-        c.execute(query)
-        conn.commit()
-        conn.close
-        print(f'Query executed: {query}')
-
-        
-    
-def scrub(table_name):
-    x = ''.join( chr for chr in table_name if chr.isalnum() )
-    if x == table_name:
-        return table_name
-    else:
-        print("Non-alphanumeric table name detected! Aborting!")
-        raise 
     
 def setup(bot):
     bot.add_cog(database(bot))
     conn = sqlite3.connect('bot.db')
     c = conn.cursor()
-    c.execute("CREATE TABLE IF NOT EXISTS 'guilds' ('id' TEXT, 'role' TEXT,'emoch' TEXT, 'rgid' TEXT UNIQUE)")
-    c.execute("CREATE TABLE IF NOT EXISTS 'userroles' ('uid' TEXT, 'gid' TEXT, 'rid' TEXT, 'rname' TEXT,'color' TEXT, 'ugid' TEXT UNIQUE)")
-    c.execute("CREATE TABLE IF NOT EXISTS 'users' ('id' INTEGER UNIQUE, 'name' TEXT, 'birthday' TEXT, 'location' TEXT, 'timezone' TEXT, 'pronouns' TEXT, 'sexuality' TEXT)")
+    c.execute("CREATE TABLE IF NOT EXISTS 'guconfig' ('id' INT, 'job' TEXT,'value' TEXT, 'valuetype' TEXT, 'uniqueid' TEXT UNIQUE)")
+    c.execute("CREATE TABLE IF NOT EXISTS 'gconfig' ('id' INT, 'job' TEXT, 'value' TEXT, 'valuetype' TEXT)")
+    c.execute("CREATE TABLE IF NOT EXISTS 'userroles' ('id' INT, 'uid' INT, 'rid' INT, 'rname' TEXT,'color' TEXT, 'uniqueid' TEXT UNIQUE)")
+    c.execute("CREATE TABLE IF NOT EXISTS 'users' ('id' INT UNIQUE, 'name' TEXT, 'birthday' TEXT, 'location' TEXT, 'timezone' TEXT, 'pronouns' TEXT, 'sexuality' TEXT)")
     conn.commit()
     conn.close
             

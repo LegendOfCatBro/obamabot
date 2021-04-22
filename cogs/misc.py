@@ -20,6 +20,13 @@ class misc(commands.Cog):
         print(f'Command invoked: Ping')
         await ctx.send(embed=embed)
     @commands.command(
+        name='test',
+        description='testers'
+    )
+    async def testing(self,ctx,arg):
+        print(f'test command, arg = {arg}')
+        raise commands.MissingPermissions(missing_perms=('deez'))
+    @commands.command(
         name='fuck',
         description='go away retard'
     )
