@@ -31,7 +31,6 @@ class innout(commands.Cog):
         e.set_author(name=f'{member.name} #{member.discriminator}', icon_url=member.avatar_url)
         await guild.system_channel.send(embed=e)
         
-        
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         print('Memeber left')
