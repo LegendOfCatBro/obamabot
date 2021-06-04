@@ -15,7 +15,7 @@ class database(commands.Cog):
         desciption='**obama opunbind {table} {row}**: Operator unbind, removes an item from the given table. Valid tables include: **ugconfig**, **gconfig**, and **userroles**.'
     )
     async def opunbind(self, ctx, tbl, row):
-        tblnames=('ugconfig','gconfig','userroles')
+        tblnames=('guconfig','gconfig','userroles')
         if not row.isnumeric() or tbl not in tblnames:
             raise commands.BadArgument()
             return
@@ -26,8 +26,7 @@ class database(commands.Cog):
         conn.commit()
         conn.close
 
-        x = discord.Embed(title='unbinding successful',description=f'item {row} successfully unbound',color=ctx.author.color) 
-        await ctx.send(embed = x)
+        await ctx.message.add_reaction('👍')
     
     @commands.check_any(commands.has_permissions(administrator=True), commands.is_owner())
     @commands.command(
@@ -59,8 +58,7 @@ class database(commands.Cog):
         else:
             c.execute("INSERT INTO gconfig (id, job, value, valuetype) VALUES (?,?,?,?)", args)
             print(f"config added: {job} {value} {valuetype}")
-        x = discord.Embed(title='binding successful',description=f'{job} configured to value {inpvalue}',color=ctx.author.color) 
-        await ctx.send(embed = x)
+        await ctx.message.add_reaction('👍')
         conn.commit()
         conn.close    
 
@@ -78,7 +76,7 @@ class database(commands.Cog):
             title=f'Database data for {ctx.guild.name}', 
             colour=ctx.author.color
             )
-        tablenames=('guconfig','gconfig','userroles', 'users')
+        tablenames=('guconfig','gconfig','userroles', 'users', 'punish')
         if table not in tablenames:
             raise commands.BadArgument()
         id = ctx.guild.id
@@ -109,6 +107,7 @@ class database(commands.Cog):
         if fields == 0:
             e.add_field(name='Error!', value='Table is empty')
         await ctx.send(embed=e)
+        await ctx.message.add_reaction('👍')
     
 def setup(bot):
     bot.add_cog(database(bot))
@@ -118,6 +117,7 @@ def setup(bot):
     c.execute("CREATE TABLE IF NOT EXISTS 'gconfig' ('id' INT, 'job' TEXT, 'value' TEXT, 'valuetype' TEXT)")
     c.execute("CREATE TABLE IF NOT EXISTS 'userroles' ('id' INT, 'uid' INT, 'rid' INT, 'rname' TEXT,'color' TEXT, 'uniqueid' TEXT UNIQUE)")
     c.execute("CREATE TABLE IF NOT EXISTS 'users' ('id' INT UNIQUE, 'name' TEXT, 'birthday' TEXT, 'location' TEXT, 'timezone' TEXT, 'pronouns' TEXT, 'sexuality' TEXT)")
+    c.execute("CREATE TABLE IF NOT EXISTS 'punish' ('id' INT, 'uid' INT, 'punishment' TEXT, 'start' TEXT,'end' TEXT, 'uniqueid' TEXT UNIQUE)")
     conn.commit()
     conn.close
             

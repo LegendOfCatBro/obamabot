@@ -21,20 +21,29 @@ class starboard(commands.Cog):
         conn = sqlite3.connect('bot.db')
         c = conn.cursor()
         c.execute("SELECT value FROM guconfig WHERE id=? AND job='STARCHANNEL'",(str(payload.guild_id),))
-        bid = int(c.fetchone()[0])
+        tmp = c.fetchone()
+        if not tmp:
+            return
+        bid = int(tmp[0])
         #if there is no starboard channel, ignore everything
         if not bid:
             return
         c.execute("SELECT value FROM guconfig WHERE id=? AND job='STARTHRESHOLD'",(str(payload.guild_id),))
-        starboard_threshold = int(c.fetchone()[0])
+        tmp = c.fetchone()
+        if not tmp:
+            return
+        starboard_threshold = int(tmp[0])
         c.execute("SELECT value FROM guconfig WHERE id=? AND job='STAREMOJI'",(str(payload.guild_id),))
-        starboard_emoji=c.fetchone()[0]
+        tmp = c.fetchone()
+        if not tmp:
+            return
+        starboard_emoji=tmp[0]
         #finding the channels, message, author, guild, and emoji
         board = self.bot.get_channel(bid)
         guild = self.bot.get_guild(payload.guild_id)
         sauce = guild.get_channel(payload.channel_id)
         msg = await sauce.fetch_message(payload.message_id)
-        member = msg.author
+        member = payload.member
         star = get(msg.reactions, emoji=starboard_emoji)
         #defining list of filetypes that discord embeds support
         goodtypes = ('.png', '.PNG', '.jpg', '.jpeg', '.JPG', '.JPEG', '.gif', '.gifv')
@@ -43,9 +52,12 @@ class starboard(commands.Cog):
         c.execute("SELECT value,valuetype FROM gconfig WHERE job='STARBLACKLIST' AND id=?", (str(payload.guild_id),))
         chblist = []
         rblist = []
-        for row in c.fetchall():
+        badmen=c.fetchall()
+        if not badmen:
+            return
+        for row in badmen:
             types={'ROLE':guild.roles,'CHANNEL':guild.channels}
-            item = find(lambda m: m.id == row[0], types[row[1]])
+            item = find(lambda m: m.id == int(row[0]), types[row[1]])
             if row[1]=='CHANNEL':
                 chblist.append(item)
             else:
@@ -58,7 +70,7 @@ class starboard(commands.Cog):
             await member.dm_channel.send(embed=e)
             return
         if sauce in chblist:
-            raise commands.MissingPermissions()
+            raise commands.MissingPermissions(('Channnel in starboard blacklist',))
             return
         #checking if the threshold has been passed, and if so, prep the embed
         if payload.emoji.name == starboard_emoji and star.count == starboard_threshold:
@@ -93,7 +105,7 @@ class starboard(commands.Cog):
         c.execute("SELECT value FROM guconfig WHERE id=? AND job='STARCHANNEL'",(str(payload.guild.id),))
         bid = c.fetchone()
         if not bid:
-            pass
+            return
         channel = self.bot.get_channel(int(bid[0]))
         member = payload.guild.get_member(self.bot.user.id)
         if payload.channel == channel and not payload.author == member:

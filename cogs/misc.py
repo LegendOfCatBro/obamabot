@@ -23,9 +23,8 @@ class misc(commands.Cog):
         name='test',
         description='testers'
     )
-    async def testing(self,ctx,arg):
-        print(f'test command, arg = {arg}')
-        raise commands.MissingPermissions(missing_perms=('deez'))
+    async def tting(self,ctx,arg):
+        raise commands.RoleNotFound(('deeznuts',))
     @commands.command(
         name='fuck',
         description='go away retard'

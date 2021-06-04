@@ -64,7 +64,6 @@ class userdata(commands.Cog):
                             await ch.send(embed=e)
     @bday.before_loop
     async def before_bday(self):
-        print('waiting...')
         await self.bot.wait_until_ready()
     @commands.command(
         name='timezones',
@@ -89,11 +88,11 @@ class userdata(commands.Cog):
         if args[0].lower() in tzdict.keys():
             x = discord.Embed(title=f'Timezones for region {args[0]}',description=tzdict[args[0]],color=ctx.author.color)  
         else:
-            x=discord.Embed(title='Error!',description='Not a valid region!',color=ctx.author.color)
-            await ctx.send(embed=x)
+            raise commands.BadArgument
         if args[0].lower() == 'americas':
             x.add_field(name='List wes too long, showing US and Canada',value='Do \'obama timezones americas2\' and \'americas3\' to view the full list')
         await ctx.send(embed=x)
+        await ctx.message.add_reaction('👍')
         
     @commands.command(
         name='bind',
@@ -107,8 +106,7 @@ class userdata(commands.Cog):
             arg = (ctx.author.id, args, args)
             c.execute(f"INSERT INTO users (id, {column.lower()}) VALUES (?,?) ON CONFLICT(id) DO UPDATE SET {column.lower()}=?", arg)
             print("bind successful")
-            x = discord.Embed(title='binding successful',description=f'{args} bound to {column}',color=ctx.author.color) 
-            await ctx.send(embed = x)
+            await ctx.message.add_reaction('👍')
         elif column.lower() == 'birthday':
             fmt = "%m/%d/%Y"
             try:
@@ -128,7 +126,7 @@ class userdata(commands.Cog):
                 arg = (ctx.author.id, args, args)
                 c.execute(f"INSERT INTO users (id, timezone) VALUES (?,?) ON CONFLICT(id) DO UPDATE SET timezone=?", arg)
                 print("bind successful")
-                x = discord.Embed(title='binding successful',description=f'{args} bound to {column}',color=ctx.author.color) 
+                await ctx.message.add_reaction('👍') 
                 await ctx.send(embed = x)
             else:
                 x = discord.Embed(title='Error!',description=f'Unable to identify timezone! Try \'obama timezones\' for more information on timezones I know. Timezones are case sensitive!',color=ctx.author.color)
@@ -157,6 +155,7 @@ class userdata(commands.Cog):
             return
         x = discord.Embed(title='Unbind successful',description=f'Successfully removed data for {column}',color=ctx.author.color)
         await ctx.send(embed=x)
+        await ctx.message.add_reaction('👍')
         conn.commit()
         conn.close
     @commands.command(
@@ -206,7 +205,8 @@ class userdata(commands.Cog):
         e.add_field(name='Pronouns', value=data[5])
         e.add_field(name='Sexuality', value=data[6])
         e.set_thumbnail(url=user.avatar_url)
-        await ctx.send(embed=e)  
+        await ctx.send(embed=e)
+        await ctx.message.add_reaction('👍')
     @commands.command(
         name='setrole',
         desciption='Alters your custom role'
@@ -245,7 +245,7 @@ class userdata(commands.Cog):
         conn.commit()
         conn.close
         await discord.Member.add_roles(user, role)
-            
+        await ctx.message.add_reaction('👍')
            
 def setup(bot):
     bot.add_cog(userdata(bot))
